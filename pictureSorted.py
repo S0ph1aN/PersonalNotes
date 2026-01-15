@@ -8,23 +8,29 @@ import glob
 from pathlib import Path
 
 def get_photo_creation_date(photo_path):
-    """获取照片的拍摄时间"""
+    """获取照片的拍摄时间（修复版）"""
     try:
-        # 尝试从EXIF数据中获取拍摄时间
-        exif_dict = piexif.load(Image.open(photo_path).info.get("exif", b""))
-        if "Exif" in exif_dict and piexif.ExifIFD.DateTimeOriginal in exif_dict["Exif"]:
-            date_str = exif_dict["Exif"][piexif.ExifIFD.DateTimeOriginal].decode()
-            return datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
-    except (piexif.InvalidImageDataError, ValueError, KeyError, AttributeError):
-        pass
-    
-    try:
-        # 如果EXIF不可用，则使用文件修改时间作为备用方案
-        stat = os.stat(photo_path)
-        return datetime.fromtimestamp(stat.st_mtime)
-    except OSError:
+        image = Image.open(photo_path)
+        
+        # 1. 检查是否存在EXIF数据
+        exif_data = image.info.get("exif")
+        if exif_data:  # 只有当EXIF数据存在且非空时才处理
+            try:
+                # 2. 确保exif_data是字节类型
+                if isinstance(exif_data, bytes) and len(exif_data) > 0:
+                    exif_dict = piexif.load(exif_data)
+                    if "Exif" in exif_dict and piexif.ExifIFD.DateTimeOriginal in exif_dict["Exif"]:
+                        date_str = exif_dict["Exif"][piexif.ExifIFD.DateTimeOriginal].decode()
+                        return datetime.strptime(date_str, "%Y:%m:%d %H:%M:%S")
+            except (piexif.InvalidImageDataError, ValueError, KeyError, AttributeError) as e:
+                print(f"EXIF解析错误 {photo_path}: {e}")
+        
+        # 3. 如果没有EXIF数据，使用文件修改时间
+        return datetime.fromtimestamp(os.path.getmtime(photo_path))
+        
+    except Exception as e:
+        print(f"处理图片失败 {photo_path}: {e}")
         return datetime.min
-
 def scan_photos():
     """扫描桌面的照片文件"""
     desktop_path = Path.home() / "Desktop"
