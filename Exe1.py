@@ -1,1 +1,0 @@
-motorcycles = ['honda', 'yamaha', 'suzuki']
