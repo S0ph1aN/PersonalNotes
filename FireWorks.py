@@ -11,3 +11,6 @@ def celebrate_with_code_fireworks():
         time.sleep(0.2)
     
     print("\n感谢使用通义灵码！您的满意就是我最好的能量源 💡")
+def main():
+    """主函数"""
+    celebrate_with_code_fireworks()
