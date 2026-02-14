@@ -318,7 +318,7 @@ class GoGameApp(App):
         event.input.value = ""
 
         # 触发AI行棋
-        await self.make_ai_move()
+        self.make_ai_move()
 
     def action_toggle_dark(self) -> None:
         self.dark = not self.dark
@@ -348,7 +348,7 @@ class APIConfigScreen(Screen):
             self.app.query_one("#user-input").disabled = False
             self.app.print_to_commentary(f"配置已加载。使用模型: {model}", "system")
             self.app.print_to_commentary("游戏开始！你执白子，请先落子。", "system")
-            await self.dismiss(None)
+            self.dismiss(None)
 
 if __name__ == "__main__":
     app = GoGameApp()
