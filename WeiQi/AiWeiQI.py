@@ -232,7 +232,7 @@ class GoGameApp(App):
         self.sub_title = "执白子与AI对弈"
         self.query_one("#user-input").disabled = True
         self.print_to_commentary("欢迎来到围棋对弈！请先在终端中输入API密钥和模型名称。", "system")
-
+    @work
     async def on_ready(self) -> None:
         await self.push_screen_wait(APIConfigScreen())
 
@@ -247,6 +247,7 @@ class GoGameApp(App):
             log.write(f"[bold yellow]{message}[/bold yellow]", shrink=False)
         log.scroll_end()
 
+    @work
     async def make_ai_move(self) -> None:
         """处理AI行棋逻辑"""
         if self.game_over:
